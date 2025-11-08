@@ -1,1 +1,1 @@
-export * as Keyquence from './Keyquence';
+export { default as Keyquence } from './Keyquence';
