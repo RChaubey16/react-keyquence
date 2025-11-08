@@ -5,25 +5,25 @@ A lightweight React component that listens for keyboard sequences (like the clas
 ## Installation
 
 ```bash
-pnpm add keyquence
+pnpm add react-keyquence
 ```
 
 or
 
 ```bash
-npm install keyquence
+npm install react-keyquence
 ```
 
 or
 
 ```bash
-yarn add keyquence
+yarn add react-keyquence
 ```
 
 ## Usage
 
 ```tsx
-import Keyquence from 'keyquence';
+import Keyquence from 'react-keyquence';
 
 function App() {
   return (
