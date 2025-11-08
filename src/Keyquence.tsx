@@ -14,7 +14,7 @@ interface KeySequenceListenerProps {
   resetTimeout?: number; // milliseconds
 }
 
-export default function AudioKeyquence({ 
+export default function Keyquence({ 
   sequences, 
   resetTimeout = 2000 
 }: KeySequenceListenerProps) {
@@ -76,5 +76,5 @@ export default function AudioKeyquence({
 }
 
 // Named export for convenience
-export { AudioKeyquence };
+export { Keyquence };
 export type { Sequence, KeySequenceListenerProps };

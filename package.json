@@ -1,20 +1,24 @@
 {
   "name": "react-keyquence",
   "version": "1.0.0",
-  "description": "A React component that detects keyboard sequences and triggers actions",
+  "description": "A React component that listens for keyboard sequences (like Konami code) and triggers callbacks with optional audio feedback",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc",
-    "prepublishOnly": "npm run build"
+    "build": "tsup src/index.ts --format cjs,esm --dts --clean",
+    "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
+    "lint": "eslint src --ext .ts,.tsx",
+    "prepublishOnly": "pnpm run build"
   },
   "keywords": [
     "react",
-    "nextjs",
     "keyboard",
-    "shortcuts",
+    "sequence",
+    "konami",
     "easter-egg",
-    "key-sequence"
+    "key-listener",
+    "hooks",
+    "typescript"
   ],
   "author": "Ruturaj Chaubey",
   "license": "MIT",
@@ -24,6 +28,11 @@
   "devDependencies": {
     "@types/node": "^24.10.0",
     "@types/react": "^18.2.0",
+    "@typescript-eslint/eslint-plugin": "^8.46.3",
+    "@typescript-eslint/parser": "^8.46.3",
+    "eslint": "^9.39.1",
+    "react": "^19.2.0",
+    "tsup": "^8.5.0",
     "typescript": "^5.0.0"
   },
   "files": [

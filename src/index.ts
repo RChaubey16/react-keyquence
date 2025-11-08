@@ -1,1 +1,1 @@
-export * as AudioKeyquence from './AudioKeyquence';
+export * as AudioKeyquence from './Keyquence';
