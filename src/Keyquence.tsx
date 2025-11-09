@@ -1,4 +1,3 @@
-// src/index.tsx
 'use client';
 
 import { useEffect, useRef } from 'react';
@@ -21,6 +20,7 @@ export default function Keyquence({
   const typedSequence = useRef('');
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const audioRefs = useRef<Map<string, HTMLAudioElement>>(new Map());
+  const currentlyPlayingAudio = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     // Preload all audio files
@@ -31,6 +31,14 @@ export default function Keyquence({
     });
 
     const handleKeyPress = (event: KeyboardEvent) => {
+      // Allow Escape key to stop currently playing audio
+      if (event.key === 'Escape' && currentlyPlayingAudio.current) {
+        currentlyPlayingAudio.current.pause();
+        currentlyPlayingAudio.current.currentTime = 0;
+        currentlyPlayingAudio.current = null;
+        return;
+      }
+
       typedSequence.current += event.key.toLowerCase();
 
       if (timeoutRef.current) {
@@ -42,6 +50,12 @@ export default function Keyquence({
         if (typedSequence.current.includes(seq.keys.toLowerCase())) {
           seq.onDetect();
           
+          // Stop any currently playing audio
+          if (currentlyPlayingAudio.current) {
+            currentlyPlayingAudio.current.pause();
+            currentlyPlayingAudio.current.currentTime = 0;
+          }
+          
           // Play audio if specified
           const audio = audioRefs.current.get(seq.keys);
           if (audio) {
@@ -49,6 +63,7 @@ export default function Keyquence({
             audio.play().catch(err => {
               console.error('Failed to play audio:', err);
             });
+            currentlyPlayingAudio.current = audio;
           }
           
           typedSequence.current = '';
@@ -66,6 +81,11 @@ export default function Keyquence({
       window.removeEventListener('keydown', handleKeyPress);
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
+      }
+      // Stop and clean up all audio
+      if (currentlyPlayingAudio.current) {
+        currentlyPlayingAudio.current.pause();
+        currentlyPlayingAudio.current = null;
       }
       audioRefs.current.forEach(audio => audio.pause());
       audioRefs.current.clear();
