@@ -1,4 +1,4 @@
-# Keyquence
+# React Keyquence
 
 A lightweight React component that listens for keyboard sequences (like the classic Konami code) and triggers callbacks with optional audio feedback. Perfect for adding Easter eggs to your React applications!
 

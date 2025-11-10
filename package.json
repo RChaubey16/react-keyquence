@@ -1,6 +1,6 @@
 {
   "name": "react-keyquence",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "A React component that listens for keyboard sequences (like Konami code) and triggers callbacks with optional audio feedback",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
