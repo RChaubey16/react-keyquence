@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef } from "react";
 
 interface Sequence {
   keys: string;
@@ -13,26 +13,37 @@ interface KeySequenceListenerProps {
   resetTimeout?: number; // milliseconds
 }
 
-export default function Keyquence({ 
-  sequences, 
-  resetTimeout = 2000 
+export default function Keyquence({
+  sequences,
+  resetTimeout = 2000,
 }: KeySequenceListenerProps) {
-  const typedSequence = useRef('');
+  const typedSequence = useRef("");
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const audioRefs = useRef<Map<string, HTMLAudioElement>>(new Map());
   const currentlyPlayingAudio = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     // Preload all audio files
-    sequences.forEach(seq => {
+    sequences.forEach((seq) => {
       if (seq.audioPath && !audioRefs.current.has(seq.keys)) {
         audioRefs.current.set(seq.keys, new Audio(seq.audioPath));
       }
     });
 
     const handleKeyPress = (event: KeyboardEvent) => {
+      // Ignore all shortcuts while typing in an input or editable field
+      const target = event.target as HTMLElement;
+      if (
+        target &&
+        (target.tagName === "INPUT" ||
+          target.tagName === "TEXTAREA" ||
+          target.isContentEditable)
+      ) {
+        return;
+      }
+
       // Allow Escape key to stop currently playing audio
-      if (event.key === 'Escape' && currentlyPlayingAudio.current) {
+      if (event.key === "Escape" && currentlyPlayingAudio.current) {
         currentlyPlayingAudio.current.pause();
         currentlyPlayingAudio.current.currentTime = 0;
         currentlyPlayingAudio.current = null;
@@ -46,39 +57,39 @@ export default function Keyquence({
       }
 
       // Check all sequences
-      sequences.forEach(seq => {
-        if (typedSequence.current.includes(seq.keys.toLowerCase())) {
+      sequences.forEach((seq) => {
+        if (typedSequence.current.endsWith(seq.keys.toLowerCase())) {
           seq.onDetect();
-          
+
           // Stop any currently playing audio
           if (currentlyPlayingAudio.current) {
             currentlyPlayingAudio.current.pause();
             currentlyPlayingAudio.current.currentTime = 0;
           }
-          
+
           // Play audio if specified
           const audio = audioRefs.current.get(seq.keys);
           if (audio) {
             audio.currentTime = 0;
-            audio.play().catch(err => {
-              console.error('Failed to play audio:', err);
+            audio.play().catch((err) => {
+              console.error("Failed to play audio:", err);
             });
             currentlyPlayingAudio.current = audio;
           }
-          
-          typedSequence.current = '';
+
+          typedSequence.current = "";
         }
       });
 
       timeoutRef.current = setTimeout(() => {
-        typedSequence.current = '';
+        typedSequence.current = "";
       }, resetTimeout);
     };
 
-    window.addEventListener('keydown', handleKeyPress);
+    window.addEventListener("keydown", handleKeyPress);
 
     return () => {
-      window.removeEventListener('keydown', handleKeyPress);
+      window.removeEventListener("keydown", handleKeyPress);
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
       }
@@ -87,7 +98,7 @@ export default function Keyquence({
         currentlyPlayingAudio.current.pause();
         currentlyPlayingAudio.current = null;
       }
-      audioRefs.current.forEach(audio => audio.pause());
+      audioRefs.current.forEach((audio) => audio.pause());
       audioRefs.current.clear();
     };
   }, [sequences, resetTimeout]);
