@@ -113,7 +113,7 @@ Make sure to use the component in a client component:
 ```tsx
 'use client';
 
-import Keyquence from 'keyquence';
+import Keyquence from 'react-keyquence';
 
 export default function ClientComponent() {
   return (
