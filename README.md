@@ -186,6 +186,28 @@ MIT
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
+```bash
+pnpm install
+pnpm test        # Vitest + jsdom
+pnpm run lint
+pnpm run typecheck
+```
+
+CI runs these checks against React 18 and 19 on every push and pull request.
+
+### Releasing
+
+Releases are published to npm by GitHub Actions when a version tag is pushed:
+
+```bash
+# bump "version" in package.json, then:
+git commit -am "release: 1.2.0 minor"
+git tag -a v1.2.0 -m "v1.2.0"
+git push --follow-tags
+```
+
+The tag must match the `package.json` version. The workflow runs CI, publishes with npm provenance and creates a GitHub release.
+
 ## Support
 
 If you encounter any issues or have questions, please file an issue on the GitHub repository.
