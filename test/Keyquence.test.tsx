@@ -207,6 +207,32 @@ describe("Keyquence", () => {
       expect(onDetect).toHaveBeenCalledTimes(1);
     });
 
+    it("ignores keys typed in contenteditable content", () => {
+      const onDetect = vi.fn();
+      render(<Keyquence sequences={[{ keys: "ab", onDetect }]} />);
+      const editor = document.body.appendChild(document.createElement("div"));
+      editor.setAttribute("contenteditable", "true");
+
+      press("a", {}, editor);
+      press("b", {}, editor);
+
+      expect(onDetect).not.toHaveBeenCalled();
+      editor.remove();
+    });
+
+    it("ignores keys typed in an input inside a shadow root", () => {
+      const onDetect = vi.fn();
+      render(<Keyquence sequences={[{ keys: "ab", onDetect }]} />);
+      const host = document.body.appendChild(document.createElement("div"));
+      const input = host.attachShadow({ mode: "open" }).appendChild(document.createElement("input"));
+
+      press("a", { composed: true }, input);
+      press("b", { composed: true }, input);
+
+      expect(onDetect).not.toHaveBeenCalled();
+      host.remove();
+    });
+
     it.each(["input", "textarea", "select"])("ignores keys typed in a <%s>", (tag) => {
       const onDetect = vi.fn();
       render(<Keyquence sequences={[{ keys: "ab", onDetect }]} />);

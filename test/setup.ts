@@ -27,6 +27,16 @@ export class FakeAudio extends EventTarget {
   }
 }
 
+// jsdom does not implement isContentEditable, which browsers derive from the
+// nearest contenteditable ancestor.
+Object.defineProperty(HTMLElement.prototype, "isContentEditable", {
+  configurable: true,
+  get(this: HTMLElement) {
+    const editable = this.closest("[contenteditable]");
+    return editable !== null && editable.getAttribute("contenteditable") !== "false";
+  },
+});
+
 beforeEach(() => {
   FakeAudio.instances = [];
   vi.stubGlobal("Audio", FakeAudio);

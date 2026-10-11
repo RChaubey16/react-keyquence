@@ -120,7 +120,10 @@ export function useKeyquence(
     };
 
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (isEditableTarget(event.target) || isNonTypingKey(event)) return;
+      // composedPath()[0] is the real target inside an open shadow root;
+      // event.target is retargeted to the shadow host.
+      const target = event.composedPath()[0] ?? event.target;
+      if (isEditableTarget(target) || isNonTypingKey(event)) return;
 
       if (event.key === STOP_AUDIO_KEY) {
         if (playingAudio.current && !playingAudio.current.paused) {
