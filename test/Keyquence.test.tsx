@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
-import { render } from "@testing-library/react";
-import Keyquence, { type Sequence } from "../src";
+import { render, renderHook } from "@testing-library/react";
+import Keyquence, { useKeyquence, type Sequence } from "../src";
 import { FakeAudio } from "./setup";
 
 function press(key: string, init: KeyboardEventInit = {}, target: EventTarget = window) {
@@ -99,6 +99,57 @@ describe("Keyquence", () => {
       type("ab");
 
       expect(onDetect).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("named keys", () => {
+    const konami = ["ArrowUp", "ArrowUp", "ArrowDown", "ArrowDown", "ArrowLeft", "ArrowRight", "ArrowLeft", "ArrowRight", "b", "a"];
+
+    it("matches an array of key names", () => {
+      const onDetect = vi.fn();
+      render(<Keyquence sequences={[{ keys: konami, onDetect }]} />);
+
+      konami.forEach((key) => press(key));
+
+      expect(onDetect).toHaveBeenCalledTimes(1);
+    });
+
+    it("matches key names case-insensitively", () => {
+      const onDetect = vi.fn();
+      render(<Keyquence sequences={[{ keys: ["arrowup", "B"], onDetect }]} />);
+
+      press("ArrowUp");
+      press("b");
+
+      expect(onDetect).toHaveBeenCalledTimes(1);
+    });
+
+    it("does not match an array when only part of a key name is typed", () => {
+      const onDetect = vi.fn();
+      render(<Keyquence sequences={[{ keys: ["a", "b"], onDetect }]} />);
+
+      press("a");
+      press("Tab"); // "tab" ends with "b" but is a different key
+
+      expect(onDetect).not.toHaveBeenCalled();
+    });
+
+    it("does not match a string against part of a key name", () => {
+      const onDetect = vi.fn();
+      render(<Keyquence sequences={[{ keys: "up", onDetect }]} />);
+
+      press("ArrowUp");
+
+      expect(onDetect).not.toHaveBeenCalled();
+    });
+
+    it("still matches key names joined into one string", () => {
+      const onDetect = vi.fn();
+      render(<Keyquence sequences={[{ keys: konami.join(""), onDetect }]} />);
+
+      konami.forEach((key) => press(key));
+
+      expect(onDetect).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -253,6 +304,29 @@ describe("Keyquence", () => {
       unmount();
 
       expect(FakeAudio.instances[0].paused).toBe(true);
+    });
+  });
+
+  describe("useKeyquence", () => {
+    it("detects sequences without rendering a component", () => {
+      const onDetect = vi.fn();
+      renderHook(() => useKeyquence([{ keys: "ab", onDetect }]));
+
+      type("ab");
+
+      expect(onDetect).toHaveBeenCalledTimes(1);
+    });
+
+    it("accepts a resetTimeout option", () => {
+      vi.useFakeTimers();
+      const onDetect = vi.fn();
+      renderHook(() => useKeyquence([{ keys: "ab", onDetect }], { resetTimeout: 100 }));
+
+      type("a");
+      vi.advanceTimersByTime(100);
+      type("b");
+
+      expect(onDetect).not.toHaveBeenCalled();
     });
   });
 });
